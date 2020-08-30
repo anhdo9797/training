@@ -1,0 +1,98 @@
+.background {
+  background-image: url('https://cdn.magdeleine.co/wp-content/uploads/2020/08/27779526063_8ef85956e6_o-1400x933.jpg');
+  min-height: 100vh;
+  min-width: 100%;
+  position: relative;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  font-family: 'Poiret One', cursive;
+
+  .maskCover {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    opacity: 0.6;
+  }
+  @keyframes showForm {
+    from {
+      opacity: 0.6;
+      transform: translate(-50vw, 50vh);
+    }
+    to {
+      opacity: 1;
+      transform: translate(0);
+    }
+  }
+  .formAuth {
+    width: 90%;
+    min-height: 60vh;
+    max-width: 400px;
+    margin: auto auto;
+    border-left: 2px solid #00ba9d;
+    padding: 40px;
+    box-shadow: 3px 3px 14px -3px rgba(0, 0, 0, 0.75);
+    z-index: 1;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    animation-name: showForm;
+    animation-duration: 1s;
+
+    label {
+      color: #00ba9d;
+    }
+    ion-icon {
+      color: #c5c1c7;
+      font-size: 18px;
+    }
+
+    .outline {
+      color: #c5c1c7;
+      padding: 0;
+      transition: 1s;
+    }
+    .outline:hover {
+      color: #00ba9d;
+      text-decoration: underline;
+    }
+    .complete {
+      width: 40%;
+      height: 40px;
+      transition: 0.8s;
+      background-color: #00ba9d;
+      margin: auto auto;
+    }
+    .complete:hover {
+      border: 1px solid #00ba9d;
+      background-color: transparent;
+      color: #00ba9d;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+.ant-input,
+.ant-input-lg {
+  background-color: transparent;
+  color: #fffeff;
+}
+
+.ant-input-affix-wrapper,
+.ant-input-affix-wrapper-lg {
+  border: 1px solid #00ba9d;
+}
+
+.anticon,
+.anticon-eye-invisible {
+  color: #c5c1c7;
+}
