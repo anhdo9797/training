@@ -1,95 +1,155 @@
 import React, { useState } from 'react';
-import style from './style.scss';
+import { Row, message } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
 
-import PropTypes from 'prop-types';
-import { Input, Row, Button } from 'antd';
-import { Route, useHistory, useRouteMatch, Link, Switch } from 'react-router-dom';
+import './style.scss';
+import actionAuth from '../../store/auth/action';
+
+import Loading from '../../components/Loading';
+import InputForm from '../../components/Form/InputForm';
+import { checkPassword } from '../../tools/checkpass';
+import { useHistory } from 'react-router-dom';
 
 const Auth = ({ props, match }) => {
-  const [inputSI, setInputSI] = useState({
-    userName: '',
-    password: '',
-  });
+    const [inputSI, setInputSI] = useState({
+        userName: '',
+        password: '',
+    });
+    const [inputSU, setInputSU] = useState({
+        userName: '',
+        password: '',
+        confirmPass: '',
+    });
+    const [showFrom, setShowForm] = useState(true);
+    let history = useHistory();
 
-  const [inputSU, setInputSU] = useState({
-    userName: '',
-    password: '',
-  });
+    // redux
+    let loading = useSelector((state) => state.auth.loading);
+    let dispatch = useDispatch();
 
-  const [showFrom, setShowForm] = useState(true);
+    const signIn = async () => {
+        let { userName, password } = inputSI;
 
-  const signInForm = () => {
+        if (userName === '' || password === '' || checkPassword(password) == false) {
+            message.error('Please enter the correct information');
+        } else {
+            let payload = { email: inputSI.userName + '@gmail.com', password, history };
+            dispatch(actionAuth.login(payload));
+            let email = userName + '@gmail.com';
+        }
+    };
+
+    const signInForm = () => {
+        return (
+            <div className="formAuth showFormSignIn">
+                <InputForm
+                    placeholder="Enter User Name"
+                    iconName="person-circle-outline"
+                    label="Username"
+                    value={inputSI.userName}
+                    onChange={(text) => setInputSI({ ...inputSI, userName: text.target.value })}
+                />
+                <InputForm
+                    type="password"
+                    placeholder="Enter Password"
+                    iconName="lock-closed-outline"
+                    label="Password"
+                    value={inputSI.password}
+                    onChange={(text) => setInputSI({ ...inputSI, password: text.target.value })}
+                    condition={
+                        inputSI.password.length > 0 && checkPassword(inputSI.password) === false
+                    }
+                />
+                <Row justify="space-between">
+                    <button type="button" className="outline" onClick={() => setShowForm(false)}>
+                        Sign up for an account
+                    </button>
+                    <button className="outline">Forgot password ?</button>
+                </Row>
+                <Loading loading={loading} />
+                <button onClick={signIn} className="complete">
+                    Sign In
+                </button>
+            </div>
+        );
+    };
+
+    const signUp = () => {
+        let { userName, password, confirmPass } = inputSU;
+
+        if (
+            userName === '' ||
+            password === '' ||
+            checkPassword(password) == false ||
+            confirmPass !== password
+        ) {
+            message.error('Please enter the correct information');
+        } else {
+            let payload = { email: userName + '@gmail.com', password, callback: setData };
+            dispatch(actionAuth.signUp(payload));
+        }
+    };
+
+    const setData = () => {
+        //change => sign in form
+        setInputSI({ ...inputSI, userName: inputSU.userName });
+        setInputSU({ ...inputSU, password: '', confirmPass: '' });
+        setShowForm(true);
+    };
+
+    const signUpForm = () => {
+        return (
+            <div className="formAuth showFomSignUp">
+                <InputForm
+                    placeholder="Enter User Name"
+                    iconName="person-circle-outline"
+                    label="Username"
+                    value={inputSU.userName}
+                    onChange={(text) => setInputSU({ ...inputSU, userName: text.target.value })}
+                />
+                <InputForm
+                    type="password"
+                    placeholder="Enter Password"
+                    iconName="lock-closed-outline"
+                    label="Password"
+                    value={inputSU.password}
+                    onChange={(text) => setInputSU({ ...inputSU, password: text.target.value })}
+                    condition={
+                        inputSU.password.length > 0 && checkPassword(inputSU.password) === false
+                    }
+                />
+
+                <InputForm
+                    type="password"
+                    placeholder="Confirm password"
+                    iconName="lock-open-outline"
+                    label="Confirm password"
+                    value={inputSU.confirmPass}
+                    onChange={(text) => setInputSU({ ...inputSU, confirmPass: text.target.value })}
+                    condition={
+                        inputSU.confirmPass.length > 0 && inputSU.password !== inputSU.confirmPass
+                    }
+                />
+                <Row justify="space-between">
+                    <button className="outline" onClick={() => setShowForm(true)}>
+                        Already have an account
+                    </button>
+                </Row>
+                <Loading loading={loading} />
+                <button className="complete" onClick={signUp}>
+                    Sign Up
+                </button>
+            </div>
+        );
+    };
+
     return (
-      <form className="formAuth">
-        <label>Username</label>
-        <Input
-          size="large"
-          placeholder="Enter User Name"
-          prefix={<ion-icon name="person-circle-outline" />}
-          style={{ backgroundColor: 'transparent', margin: '20px 0' }}
-          value={inputSI.userName}
-          onChange={(text) => setInputSI({ ...inputSI, userName: text.target.value })}
-        />
-        <label>Password</label>
-        <Input.Password
-          size="large"
-          placeholder="Enter Password"
-          prefix={<ion-icon name="lock-closed-outline" />}
-          style={{ backgroundColor: 'transparent', margin: '20px 0' }}
-          value={inputSI.password}
-          onChange={(text) => setInputSI({ ...inputSI, password: text.target.value })}
-        />
-        <Row justify="space-between">
-          <button type="button" className="outline" onClick={() => setShowForm(false)}>
-            Sign up for an account
-          </button>
-          {/* <Link to={`${url}sig-up`}>Sign up for an account</Link> */}
-          <button className="outline">Forgot password ?</button>
-        </Row>
+        <div className={'background'}>
+            <div className="maskCover" />
 
-        <button className="complete">Sign In</button>
-      </form>
+            {showFrom ? signInForm() : signUpForm()}
+        </div>
     );
-  };
-
-  const signUpForm = () => {
-    return (
-      <form className="formAuth">
-        <label>Username</label>
-        <Input
-          size="large"
-          placeholder="Enter User Name"
-          prefix={<ion-icon name="person-circle-outline" />}
-          style={{ backgroundColor: 'transparent', margin: '20px 0' }}
-          value={inputSU.userName}
-          onChange={(text) => setInputSI({ ...inputSU, userName: text.target.value })}
-        />
-        <label>Password</label>
-        <Input.Password
-          size="large"
-          placeholder="Enter Password"
-          prefix={<ion-icon name="lock-closed-outline" />}
-          style={{ backgroundColor: 'transparent', margin: '20px 0' }}
-          value={inputSU.password}
-          onChange={(text) => setInputSI({ ...inputSU, password: text.target.value })}
-        />
-        <Row justify="space-between">
-          <button className="outline" onClick={() => setShowForm(false)}>
-            Already have an account
-          </button>
-        </Row>
-
-        <button className="complete">Sign Up</button>
-      </form>
-    );
-  };
-
-  return (
-    <div className={'background'}>
-      <div className="maskCover" />
-      {showFrom ? signInForm() : signUpForm()}
-    </div>
-  );
 };
 
 Auth.propTypes = {};

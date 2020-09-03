@@ -1,0 +1,46 @@
+@keyframes animationCard {
+    from {
+        opacity: 0.4;
+        width: 30%;
+        transform: rotateY(-90deg);
+    }
+    to {
+        transform: rotate(0);
+        opacity: 1;
+        width: 100%;
+    }
+}
+
+.main {
+    background-color: #f6f7f9;
+    min-height: 100vh;
+    position: relative;
+    header {
+        background-image: linear-gradient(to bottom right, #0e5449, #446d67);
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        button {
+            height: 50px;
+            width: 300px;
+            background-color: #f6f7f9;
+            color: #0e5449;
+            font-size: 19px;
+            font-weight: bold;
+        }
+        .ant-input {
+            color: #000;
+            font-size: 18px;
+        }
+    }
+    .wrapCard {
+        -webkit-box-shadow: 2px 0px 16px -3px rgba(0, 0, 0, 0.75);
+        -moz-box-shadow: 2px 0px 16px -3px rgba(0, 0, 0, 0.75);
+        box-shadow: 2px 0px 16px -3px rgba(0, 0, 0, 0.75);
+        margin-top: 20px;
+        .CardCov {
+            animation-name: animationCard;
+            animation-duration: 1s;
+        }
+    }
+}
