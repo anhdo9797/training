@@ -1,5 +1,5 @@
 .CardCov {
-    height: 60px;
+    height: 65px;
     padding: 20px;
     background-color: #ffff;
     display: flex;
@@ -33,4 +33,34 @@ h3 {
 
 ion-icon {
     font-size: 25px;
+}
+
+@media screen and (max-width: 800px) {
+    h3:nth-child(4) {
+        display: none;
+    }
+    h3 {
+        font-size: 16px;
+        margin: 0 10px;
+        width: 23% !important;
+    }
+    .CardCov {
+        img {
+            display: none;
+        }
+        padding: 5px;
+        .nation {
+            justify-content: flex-start;
+        }
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h3 {
+        font-size: 4vw;
+        margin: 0 10px;
+    }
+    ion-icon {
+        font-size: 4vw;
+    }
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Input } from 'antd';
+import { Modal, Input } from 'antd';
 
 import './style.scss';
 import Loading from '../../components/Loading';
@@ -9,18 +9,30 @@ import Flag from 'react-world-flags';
 import CardCov from '../../components/Card/CardCov';
 import LoadingContainer from '../../components/Loading/loading';
 
+const formatNumber = (number) => String(number).replace(/(.)(?=(\d{3})+$)/g, '$1,');
+
 const Main = (props) => {
     //redux
     let dispatch = useDispatch();
     const loading = useSelector((state) => state.cov.loading);
     const data = useSelector((state) => state.cov.data);
+    const total = data
+        ? {
+              totalCase: formatNumber(data[data.length - 1].total_cases),
+              deaths: formatNumber(data[data.length - 1].deaths),
+              recovered: formatNumber(data[data.length - 1].recovered),
+          }
+        : {};
 
     //state
     const [scroll, setScroll] = useState({
         prevScrollpos: window.pageYOffset,
         visible: true,
     });
+
     const [showCase, setShowCase] = useState(false);
+    const [showTotal, setShowTotal] = useState(false);
+    const [visible, setShowModal] = useState(false);
 
     useEffect(() => {
         dispatch(actionFetchCov.fetchData());
@@ -43,41 +55,20 @@ const Main = (props) => {
         });
     };
 
-    const onClick = async () => {
-        dispatch(actionFetchCov.fetchStart());
-        dispatch(actionFetchCov.fetchData());
-    };
-
-    const onClickCard = () => {
-        console.log('========onClick=================');
-
-        setShowCase(!showCase);
-    };
-
-    const formatNumber = (number) => String(number).replace(/(.)(?=(\d{3})+$)/g, '$1,');
     return (
         <div className="main">
             <header>
-                <Input.Search
-                    placeholder="Search nation"
-                    onSearch={(value) => console.log(value)}
-                    style={{ maxWidth: 1140, height: 50, margin: 'auto auto', color: '#000' }}
-                />
-
-                {/* <button onClick={() => setShowCase(!showCase)}>
-                    {showCase ? 'Hidden case today' : 'Show case today'}
-                </button> */}
+                <div style={{ margin: 'auto auto', width: '100%' }} className="container">
+                    <Input.Search
+                        placeholder="Search nation"
+                        onSearch={(value) => console.log(value)}
+                        style={{ height: 50 }}
+                    />
+                </div>
             </header>
             {200 - scroll.prevScrollpos > 0 ? null : (
-                <div
-                    style={{
-                        position: 'fixed',
-                        width: '100%',
-                        zIndex: 1,
-                        top: 0,
-                        // height header - scroll.prevScrollpos
-                    }}
-                >
+                // on Show when scroll down => hidden header
+                <div className="fixedCard" style={{ top: 0 }}>
                     <div className="container">
                         <CardCov
                             name={'Nation'}
@@ -87,16 +78,17 @@ const Main = (props) => {
                             changeDeaths={''}
                             recovered={'Recovered'}
                             style="noneHove"
-                            backgroundColor={200 - scroll.prevScrollpos <= 0 ? '#7db5ad' : '#fff'}
+                            showCase={showCase}
+                            backgroundColor={'#446d67'}
+                            getShowCase={() => setShowCase(!showCase)}
                         />
                     </div>
                 </div>
             )}
             {loading ? <LoadingContainer /> : null}
-
             {data && data.length > 0 ? (
                 <div className="container">
-                    <div className="wrapCard">
+                    <div className="wrapCard" style={{ marginBottom: showTotal ? 60 : 20 }}>
                         <CardCov
                             name={'Nation'}
                             changeCase={''}
@@ -105,30 +97,63 @@ const Main = (props) => {
                             changeDeaths={''}
                             recovered={'Recovered'}
                             style="noneHove"
-                            backgroundColor={200 - scroll.prevScrollpos <= 0 ? '#cfcfcf' : '#fff'}
+                            backgroundColor={'#fff'}
+                            showCase={showCase}
+                            getShowCase={() => setShowCase(!showCase)}
                         />
 
-                        {data
-                            ? data.map((e, i) => (
-                                  <CardCov
-                                      key={i}
-                                      name={e.name}
-                                      changeCase={formatNumber(e.changeCase)}
-                                      totalCase={formatNumber(e.totalCase)}
-                                      totalDeaths={formatNumber(e.totalDeaths)}
-                                      changeDeaths={formatNumber(e.deaths)}
-                                      flag={e.flag}
-                                      recovered={formatNumber(e.recovered)}
-                                      backgroundColor="#fff"
-                                      changeRecovered={formatNumber(e.changeRecovered)}
-                                      showCase={showCase}
-                                      onClick={onClickCard}
-                                  />
-                              ))
-                            : null}
+                        {data.slice(0, data.length - 1).map((e, i) => (
+                            <CardCov
+                                key={i}
+                                name={e.name}
+                                changeCase={formatNumber(e.changeCase)}
+                                totalCase={formatNumber(e.totalCase)}
+                                totalDeaths={formatNumber(e.totalDeaths)}
+                                changeDeaths={formatNumber(e.deaths)}
+                                flag={e.flag}
+                                recovered={formatNumber(e.recovered)}
+                                backgroundColor="#fff"
+                                changeRecovered={formatNumber(e.changeRecovered)}
+                                showCase={showCase}
+                                visible={visible}
+                                hiddenModal={() => setShowModal(false)}
+                                showModal={() => setShowModal(true)}
+                            />
+                        ))}
                     </div>
                 </div>
             ) : null}
+
+            <div className="fixedCard" style={{ bottom: 0, backgroundColor: 'transparent' }}>
+                <div style={{ backgroundColor: '#F6F7F9', backgroundColor: 'transparent' }}>
+                    <button onClick={() => setShowTotal(!showTotal)} style={{ marginLeft: '3vw' }}>
+                        {showTotal ? (
+                            <ion-icon name="chevron-down-outline" />
+                        ) : (
+                            <ion-icon name="chevron-up-outline" />
+                        )}
+                    </button>
+                </div>
+
+                {showTotal ? (
+                    <div style={{ backgroundColor: '#446d67' }}>
+                        <div className="container totalAllCase">
+                            <CardCov
+                                name={'Total'}
+                                changeCase={''}
+                                changeDeaths={''}
+                                totalCase={total.totalCase}
+                                totalDeaths={total.deaths}
+                                recovered={total.recovered}
+                                style="noneHove"
+                                showCase={showCase}
+                                backgroundColor={'#446d67'}
+                                hiddenIcon={true}
+                            />
+                        </div>
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 };

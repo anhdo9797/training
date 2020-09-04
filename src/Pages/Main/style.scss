@@ -11,6 +11,15 @@
     }
 }
 
+@keyframes animationAllCase {
+    from {
+        margin-bottom: -60px;
+    }
+    to {
+        margin-bottom: 0;
+    }
+}
+
 .main {
     background-color: #f6f7f9;
     min-height: 100vh;
@@ -42,5 +51,17 @@
             animation-name: animationCard;
             animation-duration: 1s;
         }
+    }
+    .fixedCard {
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+        background-color: #446d67;
+    }
+
+    .totalAllCase {
+        animation-duration: animationAllCase;
+        animation-duration: 2s;
+        background-color: #446d67;
     }
 }

@@ -13,19 +13,14 @@ export const fetchDataCov = async () => {
     });
 
     let data = Object.values(response.data.data.regions);
-
-    console.log('data', data);
-
     let dataList = [];
-
     for (let index = 0; index < data.length; index++) {
-        let value = JSON.stringify(data[index]);
-        console.log(value.name);
-
         dataList.push(analysis(data[index]));
     }
 
-    return dataList;
+    let sum = response.data.data.summary;
+
+    return [...dataList, sum];
 };
 
 const analysis = (data) => {
